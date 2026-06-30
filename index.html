@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌸 Học Tiếng Trung Cùng Gấu Trúc</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            font-family: 'Quicksand', sans-serif;
+        }
+        body {
+            background: #fdf6f0;
+            min-height: 100vh;
+        }
+        /* Khung chính */
+        .main-card {
+            background: rgba(255, 248, 240, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 48px 48px 32px 32px;
+            border: 4px solid #fce4d6;
+            box-shadow: 0 20px 60px rgba(244, 164, 96, 0.20);
+        }
+        /* Nút section */
+        .section-btn {
+            transition: all 0.2s ease;
+            border-radius: 60px;
+            padding: 10px 18px;
+            font-weight: 600;
+            color: #7f5a4b;
+            background: #fff5ed;
+            border: 2px solid transparent;
+        }
+        .section-btn:hover {
+            background: #fce4d6;
+            transform: scale(1.02);
+        }
+        .section-btn.active {
+            background: #f9b384;
+            color: white;
+            border-color: #e8926a;
+            box-shadow: 0 6px 0 #c97a55;
+        }
+        /* Nút chọn đáp án */
+        .option-btn {
+            transition: all 0.15s ease;
+            border-radius: 60px;
+            padding: 14px 20px;
+            font-weight: 600;
+            border: 3px solid #f0d5c4;
+            background: #fffbf8;
+            color: #4d3327;
+            box-shadow: 0 4px 0 #dbb8a5;
+        }
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #dbb8a5;
+        }
+        .option-btn.correct {
+            background: #b5e6b5 !important;
+            border-color: #5fa85f !important;
+            color: #1f4a1f !important;
+            box-shadow: 0 4px 0 #3f8a3f !important;
+        }
+        .option-btn.wrong {
+            background: #f9b5b5 !important;
+            border-color: #c55a5a !important;
+            color: #6b1f1f !important;
+            box-shadow: 0 4px 0 #a53f3f !important;
+        }
+        /* Hiệu ứng sao bay */
+        .float-star {
+            position: fixed;
+            font-size: 2.4rem;
+            pointer-events: none;
+            z-index: 999;
+            animation: floatUp 2.2s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.6) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-280px) scale(1.4) rotate(40deg);
+            }
+        }
+        /* Bông bay nền */
+        .petal {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.25;
+            pointer-events: none;
+            animation: fall linear infinite;
+            z-index: 0;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg) translateX(0);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg) translateX(80px);
+                opacity: 0.1;
+            }
+        }
+        /* Thanh tiến trình xinh */
+        .progress-track {
+            background: #f0ddd0;
+            border-radius: 60px;
+            height: 14px;
+            border: 2px solid #dbb8a5;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f9b384, #f5a072);
+            border-radius: 60px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        /* Sticker động viên */
+        .cheer-box {
+            background: #feeedb;
+            border-radius: 60px;
+            padding: 12px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 3px dashed #eac0aa;
+        }
+        /* Nút chính */
+        .btn-primary {
+            background: #f9b384;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 32px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 6px 0 #c97a55;
+            transition: 0.08s linear;
+            cursor: pointer;
+        }
+        .btn-primary:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #c97a55;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #c97a55;
+            pointer-events: none;
+        }
+        /* Flashcard */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-front,
+        .flip-back {
+            backface-visibility: hidden;
+        }
+        .flip-back {
+            transform: rotateY(180deg);
+        }
+        /* Scroll đẹp */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #eac0aa;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bông bay nền -->
+    <div id="petal-bg"></div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen relative z-10">
+
+        <!-- SIDEBAR -->
+        <aside class="lg:w-64 lg:min-h-screen bg-white/80 backdrop-blur-sm shadow-xl rounded-r-3xl border-r-4 border-[#fce4d6] p-4">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-5xl">🐼</span>
+                <div>
+                    <h1 class="text-xl font-bold text-[#5a3f30]">Tiếng Trung</h1>
+                    <p class="text-xs text-[#b28a78]">cùng Gấu Trúc</p>
+                </div>
+            </div>
+            <!-- Tiến trình tổng -->
+            <div class="mb-4">
+                <div class="flex justify-between text-sm text-[#8f6b58]">
+                    <span>🌟 Tiến trình</span>
+                    <span id="totalProgressText">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="totalProgressFill"></div>
+                </div>
+            </div>
+            <!-- Danh sách bài -->
+            <nav id="nav-menu" class="space-y-1 overflow-y-auto" style="max-height:60vh;">
+                <!-- JS sẽ render -->
+            </nav>
+            <!-- Sticker động viên cố định -->
+            <div class="mt-4 text-center">
+                <div class="cheer-box text-sm text-[#7a5542]">
+                    <span>🌸</span> Cố lên nhé!
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="flex-1 p-4 lg:p-8">
+            <!-- Header có thú cưng -->
+            <header class="main-card p-5 mb-6 flex flex-wrap items-center gap-4">
+                <div class="text-6xl animate-bounce">🐼</div>
+                <div>
+                    <p id="mascot-speech" class="text-xl font-bold text-[#5a3f30]">Chào bạn! Hôm nay học gì nào?</p>
+                    <p class="text-sm text-[#b28a78]">💪 Mỗi câu đúng sẽ nhận được 1 ngôi sao động viên</p>
+                </div>
+                <div class="ml-auto flex items-center gap-2 bg-[#feeedb] px-4 py-2 rounded-full">
+                    <span class="text-2xl">⭐</span>
+                    <span id="starCount" class="text-xl font-bold text-[#d48a5a]">0</span>
+                </div>
+            </header>
+
+            <!-- Nội dung chính -->
+            <div id="section-container" class="max-w-4xl mx-auto">
+                <!-- JS render -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Hộp confetti (sao bay) -->
+    <div id="confetti-box" class="fixed inset-0 pointer-events-none z-50"></div>
+
+    <script>
+        // ================ DỮ LIỆU ================
+
+        const VOCAB = [
+            { hanzi: "你好吗？", pinyin: "nǐ hǎo ma?", meaning: "Bạn khỏe không?" },
+            { hanzi: "我很好。", pinyin: "wǒ hěn hǎo.", meaning: "Tôi rất khỏe." },
+            { hanzi: "我不好。", pinyin: "wǒ bù hǎo.", meaning: "Tôi không khỏe." },
+            { hanzi: "你忙吗？", pinyin: "nǐ máng ma?", meaning: "Bạn bận không?" },
+            { hanzi: "我很忙。", pinyin: "wǒ hěn máng.", meaning: "Tôi rất bận." },
+            { hanzi: "我不忙。", pinyin: "wǒ bù máng.", meaning: "Tôi không bận." },
+            { hanzi: "你累吗？", pinyin: "nǐ lèi ma?", meaning: "Bạn mệt không?" },
+            { hanzi: "我很累。", pinyin: "wǒ hěn lèi.", meaning: "Tôi rất mệt." },
+            { hanzi: "我不累。", pinyin: "wǒ bù lèi.", meaning: "Tôi không mệt." },
+            { hanzi: "汉语难吗？", pinyin: "hànyǔ nán ma?", meaning: "Tiếng Trung khó không?" },
+            { hanzi: "汉语很难。", pinyin: "hànyǔ hěn nán.", meaning: "Tiếng Trung rất khó." },
+            { hanzi: "汉语不难。", pinyin: "hànyǔ bù nán.", meaning: "Tiếng Trung không khó." }
+        ];
+
+        const WORDS = [
+            { hanzi: "很好", pinyin: "hěn hǎo", meaning: "Rất khỏe" },
+            { hanzi: "很忙", pinyin: "hěn máng", meaning: "Rất bận" },
+            { hanzi: "很累", pinyin: "hěn lèi", meaning: "Rất mệt" },
+            { hanzi: "很难", pinyin: "hěn nán", meaning: "Rất khó" },
+            { hanzi: "不好", pinyin: "bù hǎo", meaning: "Không khỏe" },
+            { hanzi: "不忙", pinyin: "bù máng", meaning: "Không bận" },
+            { hanzi: "不累", pinyin: "bù lèi", meaning: "Không mệt" },
+            { hanzi: "不难", pinyin: "bù nán", meaning: "Không khó" },
+            { hanzi: "汉语", pinyin: "hànyǔ", meaning: "Tiếng Trung" },
+            { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Xin chào" }
+        ];
+
+        const SECTIONS = [
+            "📇 Flashcard",
+            "👂 Nghe chọn",
+            "📝 Pinyin → Hán",
+            "🔤 Hán → Nghĩa",
+            "🔗 Ghép Hán-Pinyin",
+            "🔗 Ghép Hán-Nghĩa",
+            "🎧 Hội thoại",
+            "✏️ Luyện viết",
+            "📐 Sắp xếp",
+            "🎤 Memory Game",
+            "⚡ Mini Game",
+            "📋 Kiểm tra"
+        ];
+
+        const DIALOGUES = [
+            { a: "你好吗？", b: "我很好。", q: "他怎么样？", answer: "很好", options: ["很好", "很忙", "很累", "汉语"] },
+            { a: "你忙吗？", b: "我很忙。", q: "他忙吗？", answer: "很忙", options: ["很忙", "很好", "很累", "老师"] },
+            { a: "你累吗？", b: "我不累。", q: "他累吗？", answer: "不累", options: ["不累", "很累", "很忙", "学生"] },
+            { a: "汉语难吗？", b: "汉语不难。", q: "汉语难吗？", answer: "不难", options: ["不难", "很难", "很好", "很忙"] }
+        ];
+
+        const FILL_QUESTIONS = [
+            { sentence: "你____吗？", blank: "好", options: ["好", "很", "吗", "了"] },
+            { sentence: "我____忙。", blank: "很", options: ["很", "好", "累", "吗"] },
+            { sentence: "汉语____难。", blank: "不", options: ["不", "很", "好", "吗"] },
+            { sentence: "我____累。", blank: "不", options: ["不", "很", "太", "好"] },
+            { sentence: "你____吗？", blank: "忙", options: ["忙", "好", "累", "难"] }
+        ];
+
+        const SENTENCES = [
+            { parts: ["你", "好吗"], pinyin: ["nǐ", "hǎo ma"], answer: "你好吗？" },
+            { parts: ["我", "很", "忙"], pinyin: ["wǒ", "hěn", "máng"], answer: "我很忙。" },
+            { parts: ["汉语", "难", "吗"], pinyin: ["hànyǔ", "nán", "ma"], answer: "汉语难吗？" },
+            { parts: ["我", "不", "累"], pinyin: ["wǒ", "bù", "lèi"], answer: "我不累。" },
+            { parts: ["汉语", "很", "难"], pinyin: ["hànyǔ", "hěn", "nán"], answer: "汉语很难。" }
+        ];
+
+        const WRITE_CHARS = ["你", "好", "很", "忙", "累", "汉", "语", "难", "不", "吗"];
+
+        // ================ STATE ================
+        let currentSection = 0;
+        let currentFlashcard = 0;
+        let stars = 0;
+        let totalQuestionsAnswered = 0;
+        let totalQuestionsCorrect = 0;
+
+        let mcqState = { questions: [], current: 0, score: 0, type: '' };
+        let matchState = { pairs: [], selected: null, matched: 0 };
+        let dialogueIdx = 0;
+        let fillIdx = 0;
+        let sentIdx = 0,
+            sentOrder = [];
+        let memCards = [],
+            memFlipped = [],
+            memMatched = 0;
+        let mgTime = 60,
+            mgScore2 = 0,
+            mgQ = null,
+            miniGameTimer = null;
+        let finalTestAnswers = [],
+            finalTestQuestions = [];
+        let writeIdx = 0;
+
+        // ================ ÂM THANH ================
+        let audioCtx;
+
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+
+        function playCorrectSound() {
+            try {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(523, ctx.currentTime);
+                osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.4);
+            } catch (e) {}
+        }
+
+        function playWrongSound() {
+            try {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(250, ctx.currentTime);
+                osc.frequency.setValueAtTime(180, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) {}
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'zh-CN';
+                u.rate = 0.7;
+                speechSynthesis.speak(u);
+            }
+        }
+
+        // ================ HIỆU ỨNG ================
+        function showFloatingStars(count = 6) {
+            const box = document.getElementById('confetti-box');
+            const emojis = ['⭐', '🌟', '✨', '💫', '🌸', '🌺'];
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'float-star';
+                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.left = (10 + Math.random() * 75) + '%';
+                el.style.top = (10 + Math.random() * 50) + '%';
+                el.style.fontSize = (1.8 + Math.random() * 2.2) + 'rem';
+                el.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+                box.appendChild(el);
+                setTimeout(() => el.remove(), 3000);
+            }
+        }
+
+        function showMotivation() {
+            const msgs = [
+                '🌸 Tuyệt vời! Bạn thật giỏi!',
+                '⭐ Cố lên! Bạn đang tiến bộ!',
+                '🌺 Chăm chỉ quá! Thưởng sao nè!',
+                '🌟 Bạn là ngôi sao sáng!',
+                '💪 Học vui quá phải không?'
+            ];
+            const el = document.getElementById('mascot-speech');
+            if (el) {
+                el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+                setTimeout(() => {
+                    el.textContent = 'Chào bạn! Hôm nay học gì nào?';
+                }, 2500);
+            }
+        }
+
+        // ================ BÔNG BAY NỀN ================
+        function createPetals() {
+            const container = document.getElementById('petal-bg');
+            const emojis = ['🌸', '🌺', '🌷', '🌼', '💮'];
+            for (let i = 0; i < 16; i++) {
+                const el = document.createElement('div');
+                el.className = 'petal';
+                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
+                el.style.animationDuration = (12 + Math.random() * 18) + 's';
+                el.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(el);
+            }
+        }
+        createPetals();
+
+        // ================ ĐIỂM + TIẾN TRÌNH ================
+        function updateStars() {
+            document.getElementById('starCount').textContent = stars;
+            const pct = Math.min(100, Math.round((totalQuestionsCorrect / Math.max(1, totalQuestionsAnswered)) * 100));
+            document.getElementById('totalProgressText').textContent = pct + '%';
+            document.getElementById('totalProgressFill').style.width = pct + '%';
+        }
+
+        function addStar() {
+            stars++;
+            totalQuestionsCorrect++;
+            totalQuestionsAnswered++;
+            updateStars();
+            showFloatingStars(6);
+            showMotivation();
+            playCorrectSound();
+        }
+
+        function addWrong() {
+            totalQuestionsAnswered++;
+            updateStars();
+            playWrongSound();
+        }
+
+        // ================ NAVIGATION ================
+        function buildNav() {
+            const nav = document.getElementById('nav-menu');
+            nav.innerHTML = SECTIONS.map((s, i) =>
+                `<button class="section-btn w-full text-left ${i===0?'active':''}" onclick="goSection(${i})">${s}</button>`
+            ).join('');
+        }
+
+        function goSection(idx) {
+            currentSection = idx;
+            document.querySelectorAll('.section-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+            renderSection(idx);
+        }
+
+        // ================ RENDER CHÍNH ================
+        function renderSection(idx) {
+            const c = document.getElementById('section-container');
+            switch (idx) {
+                case 0:
+                    renderFlashcards(c);
+                    break;
+                case 1:
+                    renderListenQuiz(c);
+                    break;
+                case 2:
+                    renderPinyinToHanzi(c);
+                    break;
+                case 3:
+                    renderHanziToMeaning(c);
+                    break;
+                case 4:
+                    renderMatchHanziPinyin(c);
+                    break;
+                case 5:
+                    renderMatchHanziMeaning(c);
+                    break;
+                case 6:
+                    renderDialogue(c);
+                    break;
+                case 7:
+                    renderWriting(c);
+                    break;
+                case 8:
+                    renderSentenceOrder(c);
+                    break;
+                case 9:
+                    renderMemory(c);
+                    break;
+                case 10:
+                    renderMiniGame(c);
+                    break;
+                case 11:
+                    renderFinalTest(c);
+                    break;
+                default:
+                    c.innerHTML = '<p class="text-center text-gray-400">Đang phát triển...</p>';
+            }
+        }
+
+        // ================ 1. FLASHCARD ================
+        function renderFlashcards(c) {
+            currentFlashcard = 0;
+            showFlashcard(c);
+        }
+
+        function showFlashcard(c) {
+            const v = VOCAB[currentFlashcard];
+            c.innerHTML = `
+                <div class="main-card p-6 text-center">
+                    <p class="text-sm text-[#b28a78] mb-2">${currentFlashcard+1} / ${VOCAB.length}</p>
+                    <div class="flip-card mx-auto w-64 h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-inner relative w-full h-full">
+                            <div class="flip-front absolute inset-0 bg-gradient-to-br from-[#fcd5b0] to-[#f9b384] rounded-3xl shadow-xl flex flex-col items-center justify-center p-6">
+                                <span class="text-5xl font-bold text-white mb-4">${v.hanzi}</span>
+                                <button onclick="event.stopPropagation();speak('${v.hanzi.replace(/[？。]/g,'')}')" class="mt-2 bg-white/30 hover:bg-white/50 rounded-full p-3 text-2xl">🔊</button>
+                            </div>
+                            <div class="flip-back absolute inset-0 bg-gradient-to-br from-[#a8d5e2] to-[#7fc1d4] rounded-3xl shadow-xl flex flex-col items-center justify-center p-6">
+                                <span class="text-2xl font-bold text-white mb-2">${v.pinyin}</span>
+                                <span class="text-xl text-white/90">${v.meaning}</span>
+                                <button onclick="event.stopPropagation();speak('${v.hanzi.replace(/[？。]/g,'')}')" class="mt-3 bg-white/30 hover:bg-white/50 rounded-full p-3 text-2xl">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-center gap-4">
+                        <button onclick="prevFlashcard()" class="btn-primary ${currentFlashcard===0?'opacity-50':''}" ${currentFlashcard===0?'disabled':''}>← Trước</button>
+                        <button onclick="nextFlashcard()" class="btn-primary">Tiếp →</button>
+                    </div>
+                </div>`;
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcard < VOCAB.length - 1) { currentFlashcard++;
+                showFlashcard(document.getElementById('section-container')); }
+        }
+
+        function prevFlashcard() {
+            if (currentFlashcard > 0) { currentFlashcard--;
+                showFlashcard(document.getElementById('section-container')); }
+        }
+
+        // ================ 2-4. MCQ ================
+        function renderListenQuiz(c) { renderMCQ(c, 'listen'); }
+
+        function renderPinyinToHanzi(c) { renderMCQ(c, 'pinyin'); }
+
+        function renderHanziToMeaning(c) { renderMCQ(c, 'meaning'); }
+
+        function renderMCQ(c, type) {
+            mcqState.type = type;
+            mcqState.current = 0;
+            mcqState.score = 0;
+            const pool = shuffle(WORDS).slice(0, 6);
+            mcqState.questions = pool.map(item => {
+                const wrong = shuffle(WORDS.filter(w => w.hanzi !== item.hanzi)).slice(0, 3);
+                return { correct: item, options: shuffle([item, ...wrong]) };
+            });
+            showMCQ(c);
+        }
+
+        function showMCQ(c) {
+            const q = mcqState.questions[mcqState.current];
+            let prompt = '';
+            if (mcqState.type === 'listen') {
+                prompt =
+                    `<div class="text-center mb-4"><button onclick="speak('${q.correct.hanzi}')" class="text-5xl bg-[#fce4d6] hover:bg-[#f9d0bc] rounded-full p-6 shadow">🔊</button><p class="mt-2 text-sm text-[#b28a78]">Nhấn để nghe</p></div>`;
+            } else if (mcqState.type === 'pinyin') {
+                prompt =
+                `<div class="text-center mb-4"><span class="text-3xl font-bold text-[#d48a5a]">${q.correct.pinyin}</span></div>`;
+            } else {
+                prompt =
+                `<div class="text-center mb-4"><span class="text-5xl font-bold text-[#4d3327]">${q.correct.hanzi}</span></div>`;
+            }
+
+            const optionsHtml = q.options.map((o, i) => {
+                let label = '';
+                if (mcqState.type === 'listen') {
+                    label =
+                        `<span class="text-lg font-bold">${o.hanzi}</span><span class="text-xs text-[#b28a78] block">${o.pinyin}</span>`;
+                } else if (mcqState.type === 'meaning') {
+                    label = o.meaning;
+                } else {
+                    label = o.hanzi;
+                }
+                return `<button class="option-btn w-full text-left" onclick="checkMCQ(${i},'${o.hanzi}')">${String.fromCharCode(65+i)}. ${label}</button>`;
+            }).join('');
+
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <p class="text-sm text-[#b28a78] mb-3">Câu ${mcqState.current+1}/${mcqState.questions.length}  |  ⭐ ${mcqState.score}</p>
+                    ${prompt}
+                    <div class="space-y-2">${optionsHtml}</div>
+                </div>`;
+            if (mcqState.type === 'listen') speak(q.correct.hanzi);
+        }
+
+        function checkMCQ(idx, hanzi) {
+            const q = mcqState.questions[mcqState.current];
+            const btns = document.querySelectorAll('.option-btn');
+            const isCorrect = hanzi === q.correct.hanzi;
+            btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+            if (isCorrect) { mcqState.score++;
+                addStar(); } else addWrong();
+            btns.forEach(b => b.disabled = true);
+            setTimeout(() => {
+                mcqState.current++;
+                if (mcqState.current < mcqState.questions.length) showMCQ(document.getElementById('section-container'));
+                else showMCQResult(document.getElementById('section-container'));
+            }, 1200);
+        }
+
+        function showMCQResult(c) {
+            const displayScore = currentSection === 4 || currentSection === 5 ? matchState.matched : (currentSection === 6 ?
+                dialogueIdx : mcqState.score);
+            const displayTotal = currentSection === 4 || currentSection === 5 ? matchState.pairs.length : (currentSection ===
+                6 ? DIALOGUES.length : mcqState.questions.length);
+            const pct = Math.round((displayScore / displayTotal) * 100);
+            const msg = pct >= 80 ? '🌸 Tuyệt vời! Bạn thật giỏi!' : pct >= 50 ? '🌺 Cố lên! Bạn đang tiến bộ!' :
+                '💪 Đừng nản, hãy thử lại nhé!';
+            c.innerHTML = `
+                <div class="main-card p-8 text-center">
+                    <div class="text-6xl mb-3">${pct>=80?'🏆':pct>=50?'🌟':'💪'}</div>
+                    <h2 class="text-2xl font-bold text-[#4d3327]">${displayScore}/${displayTotal}</h2>
+                    <p class="text-[#b28a78] mt-2">${msg}</p>
+                    <button onclick="renderSection(${currentSection})" class="btn-primary mt-4">🔄 Làm lại</button>
+                </div>`;
+            if (pct >= 70) showFloatingStars(12);
+        }
+
+        // ================ 5-6. MATCH ================
+        function renderMatchHanziPinyin(c) { renderMatch(c, 'pinyin'); }
+
+        function renderMatchHanziMeaning(c) { renderMatch(c, 'meaning'); }
+
+        function renderMatch(c, type) {
+            const items = shuffle(WORDS).slice(0, 4);
+            matchState = { pairs: items, selected: null, matched: 0 };
+            const left = shuffle(items.map((w, i) => ({ text: w.hanzi, id: i, side: 'left' })));
+            const right = shuffle(items.map((w, i) => ({ text: type === 'pinyin' ? w.pinyin : w.meaning, id: i,
+                side: 'right' })));
+
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <h2 class="text-xl font-bold text-[#4d3327] mb-3">${type==='pinyin'?'Ghép Hán - Pinyin':'Ghép Hán - Nghĩa'}</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">${left.map(l => `<button class="match-btn w-full p-3 rounded-2xl border-3 border-[#dbb8a5] font-bold text-lg hover:border-[#f9b384] transition bg-[#fffbf8]" data-id="${l.id}" data-side="left" onclick="selectMatch(this)">${l.text}</button>`).join('')}</div>
+                        <div class="space-y-2">${right.map(r => `<button class="match-btn w-full p-3 rounded-2xl border-3 border-[#dbb8a5] font-medium hover:border-[#f9b384] transition bg-[#fffbf8]" data-id="${r.id}" data-side="right" onclick="selectMatch(this)">${r.text}</button>`).join('')}</div>
+                    </div>
+                    <p class="text-sm text-[#b28a78] mt-3">💡 Chọn 1 ô bên trái, rồi 1 ô bên phải</p>
+                </div>`;
+        }
+
+        function selectMatch(el) {
+            if (el.disabled) return;
+            if (matchState.selected && matchState.selected.dataset.side === el.dataset.side) {
+                matchState.selected.classList.remove('ring-2', 'ring-[#f9b384]');
+                matchState.selected = el;
+                el.classList.add('ring-2', 'ring-[#f9b384]');
+                return;
+            }
+            if (!matchState.selected) {
+                matchState.selected = el;
+                el.classList.add('ring-2', 'ring-[#f9b384]');
+            } else {
+                const id1 = matchState.selected.dataset.id;
+                const id2 = el.dataset.id;
+                if (id1 === id2) {
+                    [matchState.selected, el].forEach(b => { b.classList.add('correct');
+                        b.disabled = true; });
+                    addStar();
+                    matchState.matched++;
+                    if (matchState.matched === matchState.pairs.length) setTimeout(() => showMCQResult(document
+                        .getElementById('section-container')), 800);
+                } else {
+                    [matchState.selected, el].forEach(b => b.classList.add('wrong'));
+                    addWrong();
+                    setTimeout(() => [matchState.selected, el].forEach(b => b.classList.remove('wrong', 'ring-2',
+                        'ring-[#f9b384]')), 600);
+                }
+                matchState.selected = null;
+            }
+        }
+
+        // ================ 7. DIALOGUE ================
+        function renderDialogue(c) {
+            dialogueIdx = 0;
+            showDialogue(c);
+        }
+
+        function showDialogue(c) {
+            const d = DIALOGUES[dialogueIdx];
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <p class="text-sm text-[#b28a78] mb-3">Hội thoại ${dialogueIdx+1}/${DIALOGUES.length}</p>
+                    <div class="bg-[#f5ebe3] rounded-2xl p-4 mb-4">
+                        <p class="font-bold mb-1">🐼 A：${d.a}</p>
+                        <p class="font-bold">🐻 B：${d.b}</p>
+                        <button onclick="speak('${d.a} ${d.b}')" class="mt-2 bg-[#f9b384] text-white px-5 py-2 rounded-full text-sm shadow">🔊 Nghe hội thoại</button>
+                    </div>
+                    <p class="font-bold text-lg text-[#4d3327] mb-3">❓ ${d.q}</p>
+                    <div class="space-y-2">${d.options.map((o,i) => `<button class="option-btn w-full text-left" onclick="checkDialogue(this,'${o}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+                </div>`;
+            speak(d.a + ' ' + d.b);
+        }
+
+        function checkDialogue(el, ans) {
+            const d = DIALOGUES[dialogueIdx];
+            const btns = el.parentElement.querySelectorAll('.option-btn');
+            if (ans === d.answer) { el.classList.add('correct');
+                addStar(); } else { el.classList.add('wrong');
+                addWrong();
+                btns.forEach(b => { if (b.textContent.includes(d.answer)) b.classList.add('correct'); }); }
+            btns.forEach(b => b.disabled = true);
+            setTimeout(() => {
+                dialogueIdx++;
+                if (dialogueIdx < DIALOGUES.length) showDialogue(document.getElementById('section-container'));
+                else showMCQResult(document.getElementById('section-container'));
+            }, 1200);
+        }
+
+        // ================ 8. WRITING ================
+        function renderWriting(c) {
+            writeIdx = 0;
+            showWriteChar(c);
+        }
+
+        function showWriteChar(c) {
+            const ch = WRITE_CHARS[writeIdx];
+            c.innerHTML = `
+                <div class="main-card p-6 text-center">
+                    <p class="text-sm text-[#b28a78] mb-2">${writeIdx+1}/${WRITE_CHARS.length}</p>
+                    <p class="text-7xl font-bold text-[#4d3327] mb-3">${ch}</p>
+                    <p class="text-[#b28a78] mb-4">✏️ Viết chữ này vào khung bên dưới nhé!</p>
+                    <canvas id="write-canvas" class="mx-auto bg-white/80 rounded-2xl shadow-inner border-3 border-[#f0ddd0]" width="280" height="280"></canvas>
+                    <div class="mt-4 flex justify-center gap-3">
+                        <button onclick="clearCanvas()" class="px-5 py-2 bg-[#f0ddd0] rounded-full font-semibold text-[#5a3f30]">🧹 Xóa</button>
+                        <button onclick="nextWriteChar()" class="btn-primary">Tiếp →</button>
+                    </div>
+                </div>`;
+            initCanvas();
+        }
+
+        function initCanvas() {
+            const canvas = document.getElementById('write-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#4d3327';
+            ctx.clearRect(0, 0, 280, 280);
+            // grid nhẹ
+            ctx.setLineDash([4, 6]);
+            ctx.strokeStyle = '#f0ddd0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(140, 0);
+            ctx.lineTo(140, 280);
+            ctx.moveTo(0, 140);
+            ctx.lineTo(280, 140);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.strokeStyle = '#4d3327';
+            ctx.lineWidth = 5;
+
+            const getPos = (e) => {
+                const r = canvas.getBoundingClientRect();
+                const t = e.touches ? e.touches[0] : e;
+                return { x: t.clientX - r.left, y: t.clientY - r.top };
+            };
+            canvas.onmousedown = canvas.ontouchstart = (e) => { e.preventDefault();
+                drawing = true; const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y); };
+            canvas.onmousemove = canvas.ontouchmove = (e) => { e.preventDefault(); if (!drawing) return; const p = getPos(e);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke(); };
+            canvas.onmouseup = canvas.ontouchend = () => { drawing = false; };
+        }
+
+        function clearCanvas() {
+            const cv = document.getElementById('write-canvas');
+            if (cv) { cv.getContext('2d').clearRect(0, 0, 280, 280);
+                initCanvas(); }
+        }
+
+        function nextWriteChar() {
+            writeIdx++;
+            if (writeIdx < WRITE_CHARS.length) showWriteChar(document.getElementById('section-container'));
+            else {
+                addStar();
+                showMCQResult(document.getElementById('section-container'));
+            }
+        }
+
+        // ================ 9. SENTENCE ORDER ================
+        function renderSentenceOrder(c) {
+            sentIdx = 0;
+            showSentence(c);
+        }
+
+        function showSentence(c) {
+            sentOrder = [];
+            const s = SENTENCES[sentIdx];
+            const shuffled = shuffle(s.parts.map((p, i) => ({ text: p, pinyin: s.pinyin[i] })));
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <p class="text-sm text-[#b28a78] mb-3">Câu ${sentIdx+1}/${SENTENCES.length}</p>
+                    <p class="text-[#4d3327] font-medium mb-2">🔀 Sắp xếp thành câu đúng:</p>
+                    <div id="sent-result" class="min-h-[56px] p-3 border-3 border-dashed border-[#eac0aa] rounded-2xl mb-3 flex flex-wrap gap-2 bg-white/60"></div>
+                    <div id="sent-pool" class="flex flex-wrap gap-2 mb-3">${shuffled.map((item,i) => `<button class="drag-item px-4 py-2 bg-[#fce4d6] rounded-2xl font-bold text-lg hover:bg-[#f9d0bc] flex flex-col items-center" onclick="toggleSentWord(this,'${item.text}')" data-pinyin="${item.pinyin}"><span>${item.text}</span><span class="text-xs text-[#b28a78]">${item.pinyin}</span></button>`).join('')}</div>
+                    <div class="flex gap-2">
+                        <button onclick="clearSent()" class="px-4 py-2 bg-[#f0ddd0] rounded-full font-semibold text-[#5a3f30]">🧹 Xóa</button>
+                        <button onclick="checkSent()" class="btn-primary">✅ Kiểm tra</button>
+                    </div>
+                </div>`;
+        }
+
+        function toggleSentWord(el, text) {
+            const idx = sentOrder.indexOf(text);
+            if (idx >= 0) { sentOrder.splice(idx, 1); } else { sentOrder.push(text); }
+            document.getElementById('sent-result').innerHTML = sentOrder.map(t =>
+                `<span class="px-3 py-1 bg-[#f9b384] text-white rounded-2xl font-bold">${t}</span>`).join('');
+        }
+
+        function clearSent() { sentOrder = [];
+            document.getElementById('sent-result').innerHTML = ''; }
+
+        function checkSent() {
+            const s = SENTENCES[sentIdx];
+            const attempt = sentOrder.join('');
+            const correct = s.answer.replace(/[？。]/g, '');
+            if (attempt === correct) { addStar(); } else { addWrong();
+                document.getElementById('sent-result').innerHTML +=
+                    `<p class="w-full text-red-500 mt-2">✅ Đáp án: ${s.answer}</p>`; }
+            setTimeout(() => {
+                sentIdx++;
+                if (sentIdx < SENTENCES.length) showSentence(document.getElementById('section-container'));
+                else showMCQResult(document.getElementById('section-container'));
+            }, 1200);
+        }
+
+        // ================ 10. MEMORY ================
+        function renderMemory(c) {
+            const pairs = shuffle(WORDS).slice(0, 4);
+            const cards = shuffle([...pairs.map((w, i) => ({ id: i, text: w.hanzi, pinyin: w.pinyin, type: 'hanzi' })),
+                ...pairs.map((w, i) => ({ id: i, text: w.meaning, pinyin: '', type: 'meaning' }))
+            ]);
+            memCards = cards;
+            memFlipped = [];
+            memMatched = 0;
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <h2 class="text-xl font-bold text-[#4d3327] text-center mb-3">🧠 Memory Game</h2>
+                    <div class="grid grid-cols-4 gap-3" id="mem-grid">${cards.map((card,i) => `<button class="mem-card h-24 rounded-2xl bg-gradient-to-br from-[#fcd5b0] to-[#f9b384] text-white font-bold flex flex-col items-center justify-center shadow-md hover:scale-105 transition" data-idx="${i}" onclick="flipMem(${i})"><span class="text-3xl">?</span></button>`).join('')}</div>
+                </div>`;
+        }
+
+        function flipMem(idx) {
+            if (memFlipped.length >= 2) return;
+            const btn = document.querySelectorAll('.mem-card')[idx];
+            if (btn.disabled) return;
+            const card = memCards[idx];
+            const textDisplay = card.type === 'hanzi' ?
+                `<span class="text-lg">${card.text}</span><span class="text-xs text-gray-200">${card.pinyin}</span>` :
+                card.text;
+            btn.innerHTML = textDisplay;
+            btn.classList.remove('from-[#fcd5b0]', 'to-[#f9b384]');
+            btn.classList.add('bg-white', '!text-[#4d3327]', 'border-3', 'border-[#f9b384]');
+            memFlipped.push(idx);
+            if (memFlipped.length === 2) {
+                const [a, b] = memFlipped;
+                if (memCards[a].id === memCards[b].id && a !== b) {
+                    addStar();
+                    document.querySelectorAll('.mem-card')[a].disabled = true;
+                    document.querySelectorAll('.mem-card')[b].disabled = true;
+                    memFlipped = [];
+                    memMatched++;
+                    if (memMatched === 4) setTimeout(() => showMCQResult(document.getElementById('section-container')),
+                    800);
+                } else {
+                    addWrong();
+                    setTimeout(() => {
+                        [a, b].forEach(i => {
+                            const b2 = document.querySelectorAll('.mem-card')[i];
+                            b2.innerHTML = '<span class="text-3xl">?</span>';
+                            b2.classList.add('from-[#fcd5b0]', 'to-[#f9b384]');
+                            b2.classList.remove('bg-white', '!text-[#4d3327]', 'border-3',
+                                'border-[#f9b384]');
+                        });
+                        memFlipped = [];
+                    }, 800);
+                }
+            }
+        }
+
+        // ================ 11. MINI GAME ================
+        function renderMiniGame(c) {
+            mgTime = 60;
+            mgScore2 = 0;
+            generateMGQuestion();
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-[#4d3327]">⚡ Mini Game</span>
+                        <span id="mg-timer" class="text-xl font-bold text-[#d48a5a]">⏱ 60s</span>
+                        <span id="mg-score" class="text-lg font-bold text-[#f9b384]">🏆 0</span>
+                    </div>
+                    <div id="mg-content"></div>
+                </div>`;
+            showMGQuestion();
+            miniGameTimer = setInterval(() => {
+                mgTime--;
+                document.getElementById('mg-timer').textContent = `⏱ ${mgTime}s`;
+                if (mgTime <= 0) { clearInterval(miniGameTimer);
+                    endMiniGame(); }
+            }, 1000);
+        }
+
+        function generateMGQuestion() {
+            const type = Math.floor(Math.random() * 3);
+            const item = WORDS[Math.floor(Math.random() * WORDS.length)];
+            const wrong = shuffle(WORDS.filter(w => w.hanzi !== item.hanzi)).slice(0, 3);
+            const options = shuffle([item, ...wrong]);
+            if (type === 0) mgQ = { prompt: '🔊 Nghe', speak: item.hanzi, options: options.map(o => o.hanzi),
+                answer: item.hanzi };
+            else if (type === 1) mgQ = { prompt: item.pinyin, speak: null, options: options.map(o => o.hanzi),
+                answer: item.hanzi };
+            else mgQ = { prompt: item.hanzi, speak: null, options: options.map(o => o.meaning), answer: item
+                .meaning };
+        }
+
+        function showMGQuestion() {
+            const el = document.getElementById('mg-content');
+            if (!el) return;
+            el.innerHTML =
+                `<div class="text-center mb-3"><span class="text-2xl font-bold text-[#4d3327]">${mgQ.prompt}</span>${mgQ.speak?`<button onclick="speak('${mgQ.speak}')" class="ml-2 text-2xl">🔊</button>`:''}</div>
+                <div class="grid grid-cols-2 gap-2">${mgQ.options.map(o => `<button class="option-btn text-center" onclick="checkMG(this,'${o}')">${o}</button>`).join('')}</div>`;
+            if (mgQ.speak) speak(mgQ.speak);
+        }
+
+        function checkMG(el, ans) {
+            if (ans === mgQ.answer) { mgScore2++;
+                addStar();
+                document.getElementById('mg-score').textContent = `🏆 ${mgScore2}`; } else addWrong();
+            generateMGQuestion();
+            showMGQuestion();
+        }
+
+        function endMiniGame() {
+            document.getElementById('section-container').innerHTML = `
+                <div class="main-card p-8 text-center">
+                    <div class="text-6xl mb-3">⚡</div>
+                    <h2 class="text-2xl font-bold text-[#4d3327]">Kết quả Mini Game</h2>
+                    <p class="text-4xl font-bold text-[#f9b384] my-3">${mgScore2} điểm</p>
+                    <p class="text-[#b28a78]">${mgScore2>=10?'🌸 Siêu giỏi!':'💪 Cố lên nhé!'}</p>
+                    <button onclick="renderSection(10)" class="btn-primary mt-4">🔄 Chơi lại</button>
+                </div>`;
+            if (mgScore2 >= 10) showFloatingStars(16);
+        }
+
+        // ================ 12. FINAL TEST ================
+        function renderFinalTest(c) {
+            finalTestQuestions = generateFinalTest();
+            finalTestAnswers = [];
+            showFinalQ(c, 0);
+        }
+
+        function generateFinalTest() {
+            const qs = [];
+            const pool = shuffle(WORDS);
+            for (let i = 0; i < 10; i++) {
+                const item = pool[i % pool.length];
+                const wrong = shuffle(pool.filter(w => w.hanzi !== item.hanzi)).slice(0, 3);
+                qs.push({ type: 'listen', prompt: item.hanzi, options: shuffle([item, ...wrong]).map(o => o.hanzi),
+                    answer: item.hanzi });
+            }
+            for (let i = 0; i < 8; i++) {
+                const item = pool[i % pool.length];
+                const wrong = shuffle(pool.filter(w => w.hanzi !== item.hanzi)).slice(0, 3);
+                qs.push({ type: 'recognize', prompt: item.hanzi, options: shuffle([item, ...wrong]).map(o => o.meaning),
+                    answer: item.meaning });
+            }
+            for (let i = 0; i < 6; i++) {
+                const item = pool[i % pool.length];
+                const wrong = shuffle(pool.filter(w => w.hanzi !== item.hanzi)).slice(0, 3);
+                qs.push({ type: 'pinyin', prompt: item.pinyin, options: shuffle([item, ...wrong]).map(o => o.hanzi),
+                    answer: item.hanzi });
+            }
+            const grammarQs = [
+                { prompt: "你____吗？", options: ["好", "很", "吗", "了"], answer: "好" },
+                { prompt: "我____忙。", options: ["很", "好", "累", "吗"], answer: "很" },
+                { prompt: "汉语____难。", options: ["不", "很", "好", "吗"], answer: "不" },
+                { prompt: "你____吗？", options: ["忙", "好", "累", "难"], answer: "忙" },
+                { prompt: "我____累。", options: ["不", "很", "太", "好"], answer: "不" },
+                { prompt: "你____好吗？", options: ["好", "很", "吗", "了"], answer: "好" }
+            ];
+            grammarQs.forEach(g => qs.push({ type: 'grammar', ...g }));
+            return shuffle(qs).slice(0, 30);
+        }
+
+        function showFinalQ(c, idx) {
+            if (idx >= finalTestQuestions.length) { showFinalResult(c); return; }
+            const q = finalTestQuestions[idx];
+            let promptHtml = '';
+            if (q.type === 'listen') promptHtml =
+                `<button onclick="speak('${q.prompt}')" class="text-5xl bg-[#fce4d6] hover:bg-[#f9d0bc] rounded-full p-6 shadow">🔊</button>`;
+            else promptHtml = `<span class="text-3xl font-bold text-[#4d3327]">${q.prompt}</span>`;
+            c.innerHTML = `
+                <div class="main-card p-6">
+                    <div class="flex justify-between mb-3"><span class="text-sm text-[#b28a78]">Câu ${idx+1}/30</span><span class="text-sm font-bold text-[#f9b384]">${finalTestAnswers.filter(a=>a).length} ✓</span></div>
+                    <div class="text-center mb-4">${promptHtml}</div>
+                    <div class="space-y-2">${q.options.map((o,i) => `<button class="option-btn w-full text-left" onclick="answerFinal(${idx},this,'${o}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+                </div>`;
+            if (q.type === 'listen') speak(q.prompt);
+        }
+
+        function answerFinal(idx, el, ans) {
+            const q = finalTestQuestions[idx];
+            const correct = ans === q.answer;
+            finalTestAnswers[idx] = correct;
+            const btns = el.parentElement.querySelectorAll('.option-btn');
+            el.classList.add(correct ? 'correct' : 'wrong');
+            if (!correct) btns.forEach(b => { if (b.textContent.includes(q.answer)) b.classList.add('correct'); });
+            if (correct) addStar();
+            else addWrong();
+            btns.forEach(b => b.disabled = true);
+            setTimeout(() => showFinalQ(document.getElementById('section-container'), idx + 1), 1000);
+        }
+
+        function showFinalResult(c) {
+            const score = Math.round(finalTestAnswers.filter(a => a).length / 30 * 100);
+            let badge = '📚',
+                msg = '💪 Hãy luyện tập thêm nhé!';
+            if (score >= 90) { badge = '🏆';
+                msg = '🌸 Siêu giỏi! Bạn là học sinh xuất sắc!'; } else if (score >= 80) { badge = '🥇';
+                msg = '🌺 Rất tốt! Cố lên nữa nhé!'; } else if (score >= 70) { badge = '🥈';
+                msg = '🌟 Làm tốt lắm! Tiếp tục phát huy!'; }
+            c.innerHTML = `
+                <div class="main-card p-8 text-center">
+                    <div class="text-7xl mb-3">${badge}</div>
+                    <h2 class="text-4xl font-bold text-[#4d3327]">${score}%</h2>
+                    <p class="text-[#b28a78] text-lg mt-2">${msg}</p>
+                    <button onclick="renderSection(11)" class="btn-primary mt-4">🔄 Làm lại</button>
+                </div>`;
+            if (score >= 70) showFloatingStars(20);
+        }
+
+        // ================ UTILITY ================
+        function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math
+                .random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+        // ================ INIT ================
+        document.addEventListener('DOMContentLoaded', () => {
+            buildNav();
+            renderSection(0);
+            updateStars();
+        });
+    </script>
+</body>
+</html>
